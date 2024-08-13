@@ -1,31 +1,34 @@
 import ExportSvg from './ExportSvg'
+export const baseUrl = 'https://wanasa.mrtable.ae/api'
+// export const SP_KEY = 'pk_test_51Pjir909Qlf6znZyPJKWaATb6BQCubm7NTPIGBL0449uEjz82nv7d6fHGGOOwinDogCK3uJYWtJzdWhvFrQDjoEx00e5Iv94BY'
+export const SP_KEY = 'pk_test_51PV9zKFt9d3eerZLogRwve2G5YO4ZUNIUnLCEFpiljRIfKVN7hI7dle16OjcnN2ly7T2vwmB9FWJG0JGzSMCQnNe00k69iWIhI'
 
 export const discountProducts = [
     {
         "discount": '50% off',
-        "subText": "on everything today",
-        "extraTxt": "With code rikafashion 2021",
+        "title": "on everything today",
+        "subTitle": "With code rikafashion 2021",
         "bgImage": require('../assets/discountImages/discount1.png')
 
     },
     {
         "discount": '70% off',
-        "subText": "on everything today",
-        "extraTxt": "With code rikafashion 2021",
+        "title": "on everything today",
+        "subTitle": "With code rikafashion 2021",
         "bgImage": require('../assets/discountImages/discount2.png')
 
     },
     {
         "discount": '75% off',
-        "subText": "on everything today",
-        "extraTxt": "With code rikafashion 2021",
+        "title": "on everything today",
+        "subTitle": "With code rikafashion 2021",
         "bgImage": require('../assets/discountImages/discount3.png')
 
     },
     {
         "discount": '60% off',
-        "subText": "on everything today",
-        "extraTxt": "With code rikafashion 2021",
+        "title": "on everything today",
+        "subTitle": "With code rikafashion 2021",
         "bgImage": require('../assets/discountImages/discount1.png')
 
     },
@@ -217,9 +220,7 @@ export const filters = [
     {
         title: "Jackets"
     },
-    {
-        title: "Jeans"
-    },
+   
     {
         title: "Shoes"
     },
@@ -254,13 +255,13 @@ export const filters = [
 export const sorted = [
 
     {
-        title: "New Today"
+        name: "New Today"
     },
     {
-        title: "New This Week"
+        name: "New This Week"
     },
     {
-        title: "Top Sellers"
+        name: "Top Sellers"
     },
 ]
 
@@ -362,6 +363,25 @@ export const dressList = [
 
     },
 ]  
+
+
+export const paymentMethodCard = [
+    {
+        paymentName: "Apple pay",
+        svg: <ExportSvg.ApplePay />
+    },
+    {
+        paymentName: "Credit Card",
+        svg: <ExportSvg.CreditCard />
+
+    },
+    {
+        paymentName: "Cash",
+        svg: <ExportSvg.Wallet />
+
+    },
+
+]
 
 
 

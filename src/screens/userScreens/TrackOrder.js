@@ -1,27 +1,112 @@
-import { Modal, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
-import React, { useState } from 'react'
+import { FlatList, Modal, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import ExportSvg from '../../constants/ExportSvg'
 import SearchInput from '../../components/SearchInput'
 import { color } from '../../constants/color'
 import ProgressBar from '../../components/ProgressBar'
 import PaymentSuccessModal from '../../components/PaymentSuccessModal'
+import { getOrder } from '../../services/UserServices'
+import { useSelector } from 'react-redux'
+import ScreenLoader from '../../components/ScreenLoader'
 
 const TrackOrder = ({ navigation }) => {
+
+    const userId = useSelector((state) => state.auth?.userId)
     const [currentPosition, setCurrentPosition] = useState(0);
-    const [modalVisible, setModalVisible] = useState(false);
+    const [storeOrder, setStoreOrder] = useState([]);
+    const [singleOrder, setSingleOrder] = useState('');
+    const [isRefresh, setIsRefresh] = useState(false);
+    const [isLoader, setIsLoader] = useState(false);
 
 
-    const TrackingBox = ({ trackingSvg, TrackingId, TrackingAddress, TrackingStatus }) => {
+    useEffect(() => {
+        orderData()
+    }, [])
+
+
+    useEffect(() => {
+
+        if (singleOrder?.order_status == 'confirmed') {
+            setCurrentPosition(0)
+        } else if (singleOrder?.order_status == 'processing') {
+            setCurrentPosition(1)
+        } else if (singleOrder?.order_status == 'delivery') {
+            setCurrentPosition(2)
+        } else if(singleOrder?.order_status == 'completed') {
+            setCurrentPosition(3)
+        }
+
+    }, [singleOrder])
+
+
+
+
+
+    const orderData = async () => {
+        setIsLoader(true)
+        try {
+            const response = await getOrder(userId)
+            if (response?.status == 'success') {
+                setIsLoader(false)
+                setStoreOrder(response?.data)
+                setSingleOrder(response?.data[0])
+            }else{
+                setIsLoader(false)
+            }
+        } catch (error) {
+            setIsLoader(false)
+            console.log(error)
+        }
+    }
+
+
+    const onOrderPress = (item) => {
+        setSingleOrder(item)
+        if (item?.order_status == 'confirmed') {
+            setCurrentPosition(0)
+        } else if (item?.order_status == 'processing') {
+            setCurrentPosition(1)
+        }
+    }
+
+
+    const renderItem = ({ item, index }) => {
+        const text = item?.order_status.charAt(0).toUpperCase() + item?.order_status.slice(1).toLowerCase();
         return (
-            <View style={styles.TrackingStatusBox}>
-                {trackingSvg}
+            <TouchableOpacity onPress={() => onOrderPress(item)} style={styles.TrackingStatusBox}>
+                <ExportSvg.Car />
                 <View style={{ marginLeft: 10 }}>
-                    <Text style={styles.trackingNo}>{TrackingId}</Text>
-                    <Text style={styles.expressTxt}>{TrackingAddress}</Text>
+                    <Text style={styles.trackingNo}>{item?.track_number}</Text>
+                    <Text style={styles.expressTxt}>{item?.address}</Text>
                 </View>
-                <Text style={[styles.TrackingTxt, { color: TrackingStatus == 'Delivered' ? '#AAAAAA' : TrackingStatus == 'On the way' ? color.theme : '#333333' }]}>{TrackingStatus}</Text>
-            </View>
+                {/* <Text style={[styles.TrackingTxt, { color: TrackingStatus == 'Delivered' ? '#AAAAAA' : TrackingStatus == 'On the way' ? color.theme : '#333333' }]}>{item?.order_status}</Text> */}
+                <Text style={[styles.TrackingTxt,{color:item?.order_status == 'confirmed'  ? '#333333' : item?.order_status == 'processing' ? '#AAAAAA' : item?.order_status == 'delivery' ?'#AAAAAA': 'green'}]}>{text}</Text>
+            </TouchableOpacity>
         )
+    }
+
+    const onRefresh = async()=>{
+        setIsRefresh(true)
+        try {
+            const response = await getOrder(userId)
+            if (response?.status == 'success') {
+                setIsRefresh(false)
+                setStoreOrder(response?.data)
+                setSingleOrder(response?.data[0])
+            }else{
+                setIsRefresh(false)
+            }
+        } catch (error) {
+            console.log(error)
+            setIsRefresh(false)
+
+        }
+    }
+
+    if(isLoader){
+     return(
+        <ScreenLoader/>
+     )
     }
 
     return (
@@ -31,22 +116,24 @@ const TrackOrder = ({ navigation }) => {
                     <ExportSvg.ClickMenuBar />
                 </TouchableOpacity>
                 <ExportSvg.SmallLogo />
-                <ExportSvg.Cart />
+               {/* <TouchableOpacity onPress={()=>navigation.navigate('MyCart')}> 
+               <ExportSvg.Cart />
+               </TouchableOpacity> */}
             </View>
 
-            <View style={styles.searchContainer}>
+            {/* <View style={styles.searchContainer}>
                 <View style={{ width: "82%" }}>
                     <SearchInput />
                 </View>
                 <TouchableOpacity onPress={() => navigation.navigate('Filters')}>
                     <ExportSvg.Scanner />
                 </TouchableOpacity>
-            </View>
+            </View> */}
 
             <View style={styles.TrackingNumberBox}>
                 <ExportSvg.CurveIcon style={{ marginTop: 4 }} />
                 <View style={{ marginLeft: 10 }}>
-                    <Text style={styles.trackingNo}>6556 23341 8090</Text>
+                    <Text style={styles.trackingNo}>{singleOrder?.track_number}</Text>
                     <Text style={styles.expressTxt}>Ena Express</Text>
                 </View>
                 <Text style={styles.orderPlacedTxt}>Order Placed</Text>
@@ -56,7 +143,7 @@ const TrackOrder = ({ navigation }) => {
                 setCurrentPosition={setCurrentPosition}
             />
 
-            <View style={styles.dateLocationBox}>
+            {/* <View style={styles.dateLocationBox}>
                 <TouchableOpacity onPress={() => setCurrentPosition(currentPosition < 3 ? currentPosition + 1 : 3)}>
                     <Text style={styles.expressTxt}>25 June,2021</Text>
                     <Text style={styles.trackingNo}>Warehouse 01</Text>
@@ -65,21 +152,31 @@ const TrackOrder = ({ navigation }) => {
                     <Text style={styles.expressTxt}>25 June,2021</Text>
                     <Text style={styles.trackingNo}>Hawali-Kuwait</Text>
                 </TouchableOpacity>
-            </View>
+            </View> */}
 
-            <TouchableOpacity onPress={() => setModalVisible(true)}>
                 <Text style={styles.TitleTracking}>Tracking</Text>
-            </TouchableOpacity>
 
-            <TrackingBox
+            <FlatList
+                data={storeOrder}
+                refreshing={isRefresh}
+                onRefresh={onRefresh}
+                keyExtractor={(item, index) => index?.toString()}
+                renderItem={renderItem}
+                contentContainerStyle={{ paddingHorizontal: 5, paddingBottom: 100 }}
+                showsVerticalScrollIndicator={false}
+
+            />
+
+
+            {/* <TrackingBox
                 trackingSvg={<ExportSvg.Car />}
                 TrackingId={'US 2343445668'}
                 TrackingAddress={'Hawali - Kuwait'}
                 TrackingStatus={'Delivered'}
 
-            />
+            /> */}
 
-            <TrackingBox
+            {/* <TrackingBox
                 trackingSvg={<ExportSvg.Bike />}
                 TrackingId={'US 2343445652'}
                 TrackingAddress={'Hawali - Kuwait'}
@@ -93,14 +190,7 @@ const TrackOrder = ({ navigation }) => {
                 TrackingAddress={'Haali - Kuwait'}
                 TrackingStatus={'Confirmed'}
 
-            />
-
-            <PaymentSuccessModal
-                modalVisible={modalVisible}
-                setModalVisible={setModalVisible}
-
-            />
-
+            /> */}
 
         </View>
     )
@@ -113,6 +203,7 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingTop: 40,
         paddingHorizontal: 15,
+        // marginHorizontal: 15,
         backgroundColor: "#fff"
 
 
@@ -121,7 +212,8 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        marginBottom: 15
+        marginBottom: 15,
+        width:"70%"
     },
     searchContainer: {
         flexDirection: "row",

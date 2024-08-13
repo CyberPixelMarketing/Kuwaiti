@@ -1,9 +1,10 @@
 import { FlatList, Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import ExportSvg from '../../constants/ExportSvg'
 import SearchInput from '../../components/SearchInput'
 import { color } from '../../constants/color'
 import { dressList } from '../../constants/data'
+import { categoriesList } from '../../services/UserServices'
 
 const CategoriesList = ({ navigation }) => {
   const [selectedCat, setSelectedCat] = useState()
@@ -23,15 +24,18 @@ const CategoriesList = ({ navigation }) => {
     },
   ]
 
+
+
+
   const renderItem = ({ item, index }) => {
     const isSecondColumn = (index % 2 !== 0);
 
     return (
       <View style={isSecondColumn && { top: 40 }}>
-          <Image source={item?.img} />
-          <View style={{ position: "absolute", right: 0, padding: 10 }}>
-            <ExportSvg.Favorite />
-          </View>
+        <Image source={item?.img} />
+        <View style={{ position: "absolute", right: 0, padding: 10 }}>
+          <ExportSvg.Favorite />
+        </View>
         <View style={{ marginVertical: 20, alignItems: "center" }}>
           <Text style={styles.imgTitle}>{item?.title}</Text>
           <Text style={styles.imgSubTitle}>{item?.subTxt}</Text>
@@ -70,14 +74,14 @@ const CategoriesList = ({ navigation }) => {
         }
       </View>
 
-      <View style={{ marginTop: 25,flex:1 }}>
+      <View style={{ marginTop: 25, flex: 1 }}>
         <FlatList
           data={dressList}
           numColumns={2}
           keyExtractor={(item, index) => index?.toString()}
           renderItem={renderItem}
           columnWrapperStyle={{ justifyContent: "space-around" }}
-          contentContainerStyle={{paddingBottom:50}}
+          contentContainerStyle={{ paddingBottom: 50 }}
           showsVerticalScrollIndicator={false}
         />
       </View>
@@ -91,7 +95,7 @@ export default CategoriesList
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    paddingTop: Platform.OS == 'ios'? 40 : 20,
+    paddingTop: Platform.OS == 'ios' ? 40 : 20,
     paddingHorizontal: 15,
     backgroundColor: "#fff"
   },

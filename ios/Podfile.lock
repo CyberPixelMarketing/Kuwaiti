@@ -487,9 +487,25 @@ PODS:
     - React-jsi (= 0.72.15)
     - React-logger (= 0.72.15)
     - React-perflogger (= 0.72.15)
-  - RNGestureHandler (2.17.1):
+  - RNCAsyncStorage (1.24.0):
+    - React-Core
+  - RNGestureHandler (2.18.1):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
+  - RNReanimated (3.15.0):
+    - RCT-Folly (= 2021.07.22.00)
+    - React-Core
+    - ReactCommon/turbomodule/core
+    - RNReanimated/reanimated (= 3.15.0)
+    - RNReanimated/worklets (= 3.15.0)
+  - RNReanimated/reanimated (3.15.0):
+    - RCT-Folly (= 2021.07.22.00)
+    - React-Core
+    - ReactCommon/turbomodule/core
+  - RNReanimated/worklets (3.15.0):
+    - RCT-Folly (= 2021.07.22.00)
+    - React-Core
+    - ReactCommon/turbomodule/core
   - RNScreens (3.32.0):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
@@ -497,6 +513,27 @@ PODS:
   - RNSVG (15.3.0):
     - React-Core
   - SocketRocket (0.6.1)
+  - Stripe (22.5.1):
+    - Stripe/Stripe3DS2 (= 22.5.1)
+    - StripeApplePay (= 22.5.1)
+    - StripeCore (= 22.5.1)
+    - StripeUICore (= 22.5.1)
+  - stripe-react-native (0.17.0):
+    - React-Core
+    - Stripe (~> 22.5.1)
+    - StripeFinancialConnections (~> 22.5.1)
+  - Stripe/Stripe3DS2 (22.5.1):
+    - StripeApplePay (= 22.5.1)
+    - StripeCore (= 22.5.1)
+    - StripeUICore (= 22.5.1)
+  - StripeApplePay (22.5.1):
+    - StripeCore (= 22.5.1)
+  - StripeCore (22.5.1)
+  - StripeFinancialConnections (22.5.1):
+    - StripeCore (= 22.5.1)
+    - StripeUICore (= 22.5.1)
+  - StripeUICore (22.5.1):
+    - StripeCore (= 22.5.1)
   - Yoga (1.14.0)
   - YogaKit (1.18.1):
     - Yoga (~> 1.14)
@@ -565,9 +602,12 @@ DEPENDENCIES:
   - React-runtimescheduler (from `../node_modules/react-native/ReactCommon/react/renderer/runtimescheduler`)
   - React-utils (from `../node_modules/react-native/ReactCommon/react/utils`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
+  - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
+  - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSVG (from `../node_modules/react-native-svg`)
+  - "stripe-react-native (from `../node_modules/@stripe/stripe-react-native`)"
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -585,6 +625,11 @@ SPEC REPOS:
     - libevent
     - OpenSSL-Universal
     - SocketRocket
+    - Stripe
+    - StripeApplePay
+    - StripeCore
+    - StripeFinancialConnections
+    - StripeUICore
     - YogaKit
 
 EXTERNAL SOURCES:
@@ -666,12 +711,18 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/react/utils"
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
+  RNCAsyncStorage:
+    :path: "../node_modules/@react-native-async-storage/async-storage"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
+  RNReanimated:
+    :path: "../node_modules/react-native-reanimated"
   RNScreens:
     :path: "../node_modules/react-native-screens"
   RNSVG:
     :path: "../node_modules/react-native-svg"
+  stripe-react-native:
+    :path: "../node_modules/@stripe/stripe-react-native"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -727,10 +778,18 @@ SPEC CHECKSUMS:
   React-runtimescheduler: ae08ede2e0267be2a4d8ba82a54d5908949d5a34
   React-utils: 8eb3c12fd4a4da6df3824f7d9a961d73a6ed6e5d
   ReactCommon: d2de36ed3eebe700d7169b9e80f7d1a4b98e178d
-  RNGestureHandler: 53f1b8fcdf62b349da820ef4616abeed04cde85c
+  RNCAsyncStorage: ec53e44dc3e75b44aa2a9f37618a49c3bc080a7a
+  RNGestureHandler: 9e0d0a46b7af6d21fbe3343912502afa8baf755e
+  RNReanimated: c2027c397233801d4aceb7375e000ac87ec2e67d
   RNScreens: ad1c105ac9107cf1a613bf80889485458eb20bd7
   RNSVG: a48668fd382115bc89761ce291a81c4ca5f2fd2e
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
+  Stripe: 2b2decd03146e08a350960966d41f3028c2eac29
+  stripe-react-native: d8dadcf354e592b83a838d21de8e66cb23d95408
+  StripeApplePay: b14f06ac6fc24b56704c1e598149ed0cc45e166f
+  StripeCore: 4833738f2ca4336712f279f3c2867a0a7eb67c93
+  StripeFinancialConnections: 982115b82af429968d8aa78d329a42ed7ba3feab
+  StripeUICore: 08c1efbd7e3c54ee7fa74334a37a1d4c08ba944d
   Yoga: 6f5ab94cd8b1ecd04b6e973d0bc583ede2a598cc
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 

@@ -3,19 +3,25 @@ import React from 'react'
 import ExportSvg from '../constants/ExportSvg';
 import { color } from '../constants/color';
 
-const PaymentSuccessModal = ({modalVisible,setModalVisible}) => {
+const PaymentSuccessModal = ({isPaymentSuccess,setIsPaymentSuccess,navigation}) => {
+
+    const onPress = ()=>{
+        setIsPaymentSuccess(false)
+        navigation.navigate('HomeScreen')
+    }
+
     return (
         <View>
            
             <Modal
                 animationType="fade"
                 transparent={true}
-                visible={modalVisible}
+                visible={isPaymentSuccess}
                 onRequestClose={() => {
                     Alert.alert('Modal has been closed.');
-                    setModalVisible(!modalVisible);
+                    setIsPaymentSuccess(!isPaymentSuccess);
                 }}>
-                <TouchableWithoutFeedback onPress={() => setModalVisible(false)} >
+                {/* <TouchableWithoutFeedback onPress={() => setIsPaymentSuccess(false)} > */}
                     <View style={styles.centeredView}>
                         <TouchableWithoutFeedback>
                             <View style={styles.modalView}>
@@ -25,13 +31,13 @@ const PaymentSuccessModal = ({modalVisible,setModalVisible}) => {
                                     Confirm Payment send!</Text>
                                 <TouchableOpacity
                                     style={[styles.button, styles.buttonClose]}
-                                    onPress={() => setModalVisible(!modalVisible)}>
+                                    onPress={onPress}>
                                     <Text style={styles.textStyle}>Continue Shopping</Text>
                                 </TouchableOpacity>
                             </View>
                         </TouchableWithoutFeedback>
                     </View>
-                </TouchableWithoutFeedback>
+                {/* </TouchableWithoutFeedback> */}
             </Modal>
         </View>
     )

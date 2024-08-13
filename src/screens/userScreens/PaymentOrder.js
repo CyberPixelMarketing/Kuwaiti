@@ -1,105 +1,236 @@
-import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useState } from 'react'
+import { FlatList, Image, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import ExportSvg from '../../constants/ExportSvg'
 import { color } from '../../constants/color'
-import { PaymentCards, bags } from '../../constants/data'
+import { paymentMethodCard } from '../../constants/data'
+import PaymentModal from '../../components/PaymentModal'
+import { orderConfirmed, tokenPrice, userShippingAddress } from '../../services/UserServices'
+import { useDispatch, useSelector } from 'react-redux'
+import PaymentSuccessModal from '../../components/PaymentSuccessModal'
+import { addProductToCart, clearCart } from '../../redux/reducer/ProductAddToCart'
+const PaymentOrder = ({ navigation, route }) => {
+    const { totalPrice } = route?.params
+    const dispatch = useDispatch()
+    const data = useSelector((state) => state.cartProducts?.cartProducts)
+    const userId = useSelector((state) => state.auth?.userId)
 
-const PaymentOrder = ({ navigation }) => {
+    const [modalVisible, setModalVisible] = useState(false)
+    const [isPaymentSuccess, setIsPaymentSuccess] = useState(false)
+    const [cardInfo, setCardInfo] = useState(null)
     const [selectedPayment, setSelectedPayment] = useState('')
+    const [isLoading, setIsLoading] = useState(false)
+    const [getToken, setToken] = useState({})
+    const [address, setAddress] = useState({})
+
+
+
+    useEffect(()=>{
+        getShippingAddress()
+    },[])
+
+
+    useEffect(() => {
+        if (getToken?.token !== undefined) {
+            confirmOrder();
+            sendTokenPrice()
+        }
+    }, [getToken]);
+
+
+
+    const getShippingAddress = async () => {
+        try {
+            const response = await userShippingAddress(userId)
+            if (response) {
+                setAddress(response?.data?.[response?.data?.length - 1])
+            } else {
+                alert('something went wrong')
+            }
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
 
 
     const renderItem = ({ item, index }) => {
         return (
             <View style={styles.productContainer}>
-                <Image borderRadius={5} source={item?.img} style={{ width: 60, height: 60 }} />
+                <Image borderRadius={5} source={{ uri: item?.image }} style={{ width: 60, height: 60 }} />
 
                 <View style={{ marginLeft: 10 }}>
-                    <Text style={styles.productTitle}>{item?.title}</Text>
-                    <Text style={styles.subTitle}>{item?.subTxt}</Text>
+                    <Text style={styles.productTitle}>{item?.productName}</Text>
+                    <Text style={styles.subTitle}>{item?.subText}</Text>
                     <View style={styles.sendWithIcon}>
                         <ExportSvg.ArrowCurve />
                         <Text style={styles.sendTxt}>Send</Text>
                     </View>
                 </View>
 
-
-
-                <Text style={styles.productPrice}>{item?.price}</Text>
+                <Text style={styles.productPrice}>KD{item?.price}</Text>
             </View>
-
         )
     }
-    return (
-        <View style={styles.mainContainer}>
-            <View style={styles.headerContainer}>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <ExportSvg.ClickMenuBar />
-                </TouchableOpacity>
-                <ExportSvg.SmallLogo style={styles.logoBox} />
-            </View>
-
-            <Text style={[styles.productName]}>Payment</Text>
 
 
-            {
-                PaymentCards?.map((item, index) => {
-                    const paymentSvg = item?.paymentMethod?.toLowerCase()
-                    return (
-                        <TouchableOpacity onPress={() => setSelectedPayment(paymentSvg)} style={[styles.paymentContainer, { backgroundColor: selectedPayment == paymentSvg ? color.theme : "#fff" }]}>
+    const paymentPress = (payment) => {
+        setSelectedPayment(payment)
+        if (payment == 'credit card') {
+            setModalVisible(true)
+        }
+    }
 
-                            {
-                                paymentSvg == 'credit card' ?
-                                    <View style={styles.paymentIconBg}>
-                                        <ExportSvg.Payoneer />
-                                    </View>
-                                    :
-                                    paymentSvg == 'paypal' ?
-                                        <View style={styles.paymentIconBg}>
-                                            <ExportSvg.Paypal />
-                                        </View>
-                                        :
-                                        paymentSvg == 'visa' ?
-                                            <View style={styles.paymentIconBg}>
 
-                                                <ExportSvg.VisaCard />
-                                            </View>
-                                            :
-                                            <View style={styles.paymentIconBg}>
-                                                <ExportSvg.GooglePay />
-                                            </View>
-                            }
+    const confirmOrder = async () => {
+        if (getToken?.token !== undefined) {
+            const productNo = data?.length
+            try {
+                const response = await orderConfirmed(productNo, address, totalPrice, data, userId, getToken)
+                if (response.status == 'success') {
+                    setModalVisible(false)
+                    setIsLoading(false)
+                    setIsPaymentSuccess(true)
+                    dispatch(clearCart([]))
 
-                            <Text style={[styles.paymentTxt, { color: selectedPayment == paymentSvg ? '#fff' : color.theme }]}>{item?.paymentMethod}</Text>
-                            <View style={{ width: 13, height: 13, borderWidth: 1, borderRadius: 50, borderColor: selectedPayment == paymentSvg ? '#fff' : color.theme, marginLeft: "auto" }} />
+                } else {
+                    setIsLoading(false)
+                    alert('Somthing went wrong')
+                }
 
-                        </TouchableOpacity>
-                    )
-                })
+            } catch (error) {
+                setIsLoading(false)
+                console.log(error)
+
             }
 
+        }
+    }
 
 
-            <TouchableOpacity style={styles.addCardBox} onPress={()=>navigation.navigate('TrackOrder')}>
-                <View style={styles.addCardPlusBox}>
-                    <Text style={styles.plusIcon}>+</Text>
+    const sendTokenPrice = async () => {
+        try {
+            const response = await tokenPrice(getToken?.token,totalPrice)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    return (
+        <View style={styles.mainContainer}>
+            <ScrollView contentContainerStyle={{ paddingHorizontal: 15, paddingTop: Platform.OS == 'ios' ? 40 : 20 }}>
+
+                <View style={styles.headerContainer}>
+                    <TouchableOpacity onPress={() => navigation.goBack()}>
+                        <ExportSvg.ClickMenuBar />
+                    </TouchableOpacity>
+                    <ExportSvg.SmallLogo style={styles.logoBox} />
                 </View>
-                <Text style={styles.paymentTxt}>Add Card</Text>
-            </TouchableOpacity>
+
+                <Text style={[styles.productName]}>Payment</Text>
+
+                {/* {
+                    PaymentCards?.map((item, index) => {
+                        const payment = item?.paymentMethod?.toLowerCase()
+                        return (
+                            <TouchableOpacity key={index} onPress={() => paymentPress(payment)} style={[styles.paymentContainer, { backgroundColor: selectedPayment == payment ? color.theme : "#fff" }]}>
+
+                                {
+                                    payment == 'credit card' ?
+                                        <View style={styles.paymentIconBg}>
+                                            <ExportSvg.Payoneer />
+                                        </View>
+                                        :
+                                        payment == 'paypal' ?
+                                            <View style={styles.paymentIconBg}>
+                                                <ExportSvg.Paypal />
+                                            </View>
+                                            :
+                                            payment == 'visa' ?
+                                                <View style={styles.paymentIconBg}>
+
+                                                    <ExportSvg.VisaCard />
+                                                </View>
+                                                :
+                                                <View style={styles.paymentIconBg}>
+                                                    <ExportSvg.GooglePay />
+                                                </View>
+                                }
+
+                                <Text style={[styles.paymentTxt, { color: selectedPayment == payment ? '#fff' : color.theme }]}>{item?.paymentMethod}</Text>
+                                <View style={{ width: 13, height: 13, borderWidth: 1, borderRadius: 50, borderColor: selectedPayment == payment ? '#fff' : color.theme, marginLeft: "auto" }} />
+
+                            </TouchableOpacity>
+                        )
+                    })
+                } */}
 
 
-            <Text style={[styles.productName, { marginVertical: 20 }]}>History</Text>
+                <View >
+                    {
+                        paymentMethodCard?.map((item, index) => {
+                            const payment = item?.paymentName?.toLowerCase()
+                            return (
+                                <TouchableOpacity activeOpacity={0.7} onPress={() => paymentPress(payment)} key={index} style={styles.paymentContainers}>
+                                    <View style={{ backgroundColor: selectedPayment == payment ? color.theme : "#fff", width: 18, height: 18, borderRadius: 50, alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: color.theme }}>
+                                        <ExportSvg.checks />
+                                    </View>
+                                    <View style={{ marginHorizontal: 20 }}>
+                                        {item?.svg}
+                                    </View>
+                                    <Text style={{ color: "#000", fontFamily: "Montserrat-Medium" }}>{item?.paymentName}</Text>
+                                </TouchableOpacity>
+
+                            )
+                        })
+                    }
+                </View>
 
 
-            <View style={{ marginBottom: 10,flex:1 }}>
-                <FlatList
-                    data={bags?.slice(1)}
-                    keyExtractor={(item, index) => index?.toString()}
-                    renderItem={renderItem}
-                    showsVerticalScrollIndicator={false}
+                <PaymentModal
+                    modalVisible={modalVisible}
+                    setModalVisible={setModalVisible}
+                    cardInfo={cardInfo}
+                    setCardInfo={setCardInfo}
+                    setToken={setToken}
+                    isLoading={isLoading}
+                    setIsLoading={setIsLoading}
+
                 />
 
-            </View>
+                {/* <TouchableOpacity style={styles.addCardBox} onPress={() => navigation.navigate('TrackOrder')}> */}
+                {/* <TouchableOpacity style={styles.addCardBox} onPress={() => confirmOrder()}> */}
+                {/* <TouchableOpacity style={styles.addCardBox}>
+                    <View style={styles.addCardPlusBox}>
+                        <Text style={styles.plusIcon}>+</Text>
+                    </View>
+                    <Text style={styles.paymentTxt}>Add Card</Text>
+                </TouchableOpacity> */}
+
+                <Text style={[styles.productName, { marginVertical: 20 }]}>History</Text>
+
+                <View style={{ marginBottom: 10, flex: 1, zIndex: -1 }}>
+                    <FlatList
+                        // data={bags?.slice(1)}
+                        data={data}
+                        keyExtractor={(item, index) => index?.toString()}
+                        renderItem={renderItem}
+                        showsVerticalScrollIndicator={false}
+                    />
+
+                </View>
+
+
+
+
+                <PaymentSuccessModal
+                    isPaymentSuccess={isPaymentSuccess}
+                    setIsPaymentSuccess={setIsPaymentSuccess}
+                    navigation={navigation}
+
+                />
+            </ScrollView>
+
         </View>
     )
 }
@@ -109,9 +240,7 @@ export default PaymentOrder
 const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
-        paddingTop: 40,
-        paddingHorizontal: 15,
-        backgroundColor:"#fff"
+        backgroundColor: "#fff"
 
 
     },
@@ -129,7 +258,8 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: "600",
         color: color.theme,
-        fontFamily: "Montserrat-Bold"
+        fontFamily: "Montserrat-Bold",
+        zIndex: -1
     },
     paymentContainer: {
         flexDirection: "row",
@@ -172,7 +302,8 @@ const styles = StyleSheet.create({
         marginTop: 30,
         borderStyle: 'dashed',
         borderColor: "#DDD",
-        borderRadius: 13
+        borderRadius: 13,
+        zIndex: -1
     },
     addCardPlusBox: {
         width: 40,
@@ -207,7 +338,7 @@ const styles = StyleSheet.create({
         marginBottom: 5,
         padding: 10,
         borderRadius: 10,
-        alignItems:"center"
+        alignItems: "center"
     },
     productTitle: {
         fontWeight: "600",
@@ -217,7 +348,7 @@ const styles = StyleSheet.create({
     },
     subTitle: {
         color: color.gray,
-        fontSize:12,
+        fontSize: 12,
         fontFamily: "Montserrat-Regular"
 
     },
@@ -225,24 +356,29 @@ const styles = StyleSheet.create({
         marginTop: 4,
         fontWeight: "600",
         color: color.theme,
-        marginLeft:"auto",
-        fontFamily:"Montserrat-Bold"
+        marginLeft: "auto",
+        fontFamily: "Montserrat-Bold"
 
     },
-    sendWithIcon:{
-        flexDirection:"row",
-        alignItems:"center",
-        backgroundColor:"#EEE",
-        alignSelf:"baseline",
-        paddingHorizontal:10,
-        paddingVertical:3,
-        borderRadius:5,
+    sendWithIcon: {
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: "#EEE",
+        alignSelf: "baseline",
+        paddingHorizontal: 10,
+        paddingVertical: 3,
+        borderRadius: 5,
     },
-    sendTxt:{
-        marginLeft:5,
-        color:color.theme,
-        fontFamily:"Montserrat-SemiBold",
-        fontSize:9
+    sendTxt: {
+        marginLeft: 5,
+        color: color.theme,
+        fontFamily: "Montserrat-SemiBold",
+        fontSize: 9
 
-    }
+    },
+    paymentContainers: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginTop: 15
+    },
 })

@@ -8,17 +8,27 @@ import AllProducts from '../screens/userScreens/AllProducts';
 import Filters from '../screens/userScreens/Filters';
 import ProductDetails from '../screens/userScreens/ProductDetails';
 import MyCart from '../screens/userScreens/MyCart';
+import CategoriesList from '../screens/userScreens/CategoriesList';
+import ShippingAddress from '../screens/userScreens/ShippingAddress';
+import OrderDetails from '../screens/userScreens/OrderDetails';
+import PaymentOrder from '../screens/userScreens/PaymentOrder';
 
 const Stack = createStackNavigator();
 const HomeNavigation = () => {
   return (
-    <Stack.Navigator screenOptions={{headerShown:false}}>
-    <Stack.Screen name="HomeScreen" component={HomeScreen} />
-    <Stack.Screen name="SameProduct" component={SameProduct} />
-    <Stack.Screen name="AllProducts" component={AllProducts} />
-    <Stack.Screen name="Filters" component={Filters} />
-    <Stack.Screen name="ProductDetails" component={ProductDetails} />
-  </Stack.Navigator>
+    <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName='HomeScreen'>
+      <Stack.Screen name="HomeScreen" component={HomeScreen} />
+      <Stack.Screen name="Filters" component={Filters} />
+      <Stack.Screen name="ProductDetails" component={ProductDetails} />
+      <Stack.Screen name="CategoriesList" component={CategoriesList} />
+      <Stack.Screen name="MyCart" component={MyCart} />
+      <Stack.Screen name="ShippingAddress" component={ShippingAddress} options={{
+        presentation: "modal",
+        gestureEnabled: true,
+      }} />
+      <Stack.Screen name="OrderDetails" component={OrderDetails} />
+      <Stack.Screen name="PaymentOrder" component={PaymentOrder} />
+    </Stack.Navigator>
   )
 }
 

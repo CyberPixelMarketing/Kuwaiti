@@ -1,11 +1,12 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import { color } from '../constants/color'
+import { discount } from '../constants/data'
 
-const CustomButton = ({title,onPress}) => {
+const CustomButton = ({title,onPress,style,disabled}) => {
   return (
-    <TouchableOpacity style={styles.btnContainer} onPress={onPress}>
-      <Text style={styles.innerBtn}>{title ? title : "Get Now"}</Text>
+    <TouchableOpacity disabled={disabled} style={[styles.btnContainer,style,disabled&&{backgroundColor:"gray"}]} onPress={onPress}>
+      <Text style={styles.innerBtn}>{title }</Text>
     </TouchableOpacity>
   )
 }

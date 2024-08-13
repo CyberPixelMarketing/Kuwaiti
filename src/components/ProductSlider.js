@@ -1,59 +1,64 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React from 'react'
+import { ActivityIndicator, Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import React, { useState } from 'react'
 import Carousel from 'react-native-snap-carousel';
 import { color } from '../constants/color';
 import ExportSvg from '../constants/ExportSvg';
+import { useDispatch, useSelector } from 'react-redux';
+import { productFavorite, removeFavorite } from '../redux/reducer/AddFavorite';
 
 
-const ProductSlider = ({ carouselRef, currentIndex, setCurrentIndex }) => {
-    const views1 = [
-        {
-            imgUrl: "https://picsum.photos/200/300?random=1",
-            title: "Airport Cabs",
-        },
-        {
-            imgUrl: "https://picsum.photos/200/300?random=3",
-            title: "Gift Cards",
-        },
-        {
-            imgUrl: "https://picsum.photos/200/300?random=5",
-            title: "Hourly Stays",
-        },
-        {
-            imgUrl: "https://picsum.photos/200/300?random=7",
-            title: "Travel Insurance",
-        },
-        {
-            imgUrl: "https://picsum.photos/200/300?random=9",
-            title: "Forex",
-        },
-        {
-            imgUrl: "https://picsum.photos/200/300?random=11",
-            title: "HomeStays & Villas",
-        },
-    ];
+const ProductSlider = ({ carouselRef, currentIndex, setCurrentIndex, data, setImgUrl,item }) => {
+    const dispatch = useDispatch()
+   
+    const favoriteList = useSelector((state) => state?.favorite?.AddInFavorite)
+    const isFavorite = favoriteList.some(favorite => favorite.pid === item.pid);
+  
+    const handleSnapToItem = (index) => {
+        setCurrentIndex(index)
+        setImgUrl(data[index]?.image_url);
+    }
 
+    const favoriteProduct = (item) => {
+        if (isFavorite) {
+          dispatch(removeFavorite({
+            id: item?.pid
+          }))
+        } else {
+    
+          dispatch(productFavorite({
+            price: item?.price,
+            pid: item?.pid,
+            productName: item?.name,
+            description: item?.description,
+            image: item?.image
+    
+          }))
+        }
+      }
+  
 
     const renderItem1 = ({ item, index }) => {
         return (
             <View style={styles.renderItem1_container}>
                 <TouchableOpacity
-                    style={styles.iconLeft}
+                    style={[styles.iconCommon,styles.iconLeft]}
                     onPress={() => {
                         if (carouselRef.current) {
-                            const previousIndex = index > 0 ? index - 1 : views1.length - 1;
+                            const previousIndex = index > 0 ? index - 1 : data.length - 1;
                             carouselRef.current.snapToItem(previousIndex);
                         }
                     }}
                 >
                     <ExportSvg.Arrow2 />
                 </TouchableOpacity>
-                <Image source={require('../assets/slider/sliderBag.png')} style={styles.renderItem1_img} />
+            <View style={styles.renderItem1_img}>
+                <Image resizeMode='cover' source={{ uri: item?.image_url }} style={styles.renderItem1_img} />
+            </View>
                 <TouchableOpacity
-                    style={styles.iconRight}
+                    style={[styles.iconCommon,styles.iconRight]}
                     onPress={() => {
                         if (carouselRef.current) {
-                            const nextIndex = index < views1.length - 1 ? index + 1 : 0;
+                            const nextIndex = index < data.length - 1 ? index + 1 : 0;
                             carouselRef.current.snapToItem(nextIndex);
                         }
                     }}
@@ -70,21 +75,21 @@ const ProductSlider = ({ carouselRef, currentIndex, setCurrentIndex }) => {
                 <Carousel
                     ref={carouselRef}
                     layout={"default"}
-                    data={views1}
+                    data={data}
                     renderItem={renderItem1}
-                    sliderWidth={400}
-                    itemWidth={350}
-                    onSnapToItem={(index) => setCurrentIndex(index)}
+                    sliderWidth={Dimensions.get('screen').width}
+                    itemWidth={Dimensions.get('screen').width}
+                    onSnapToItem={handleSnapToItem}
                 />
             </View>
 
 
-            <View style={{ flexDirection: "row", justifyContent: "center", marginTop: -15 }}>
+            <View style={{ flexDirection: "row", justifyContent: "center", marginTop: -50 }}>
                 {
-                    views1?.map((item, index) => {
+                    data?.map((item, index) => {
                         return (
                             <View key={index} style={{ marginRight: 10 }}>
-                                <View style={{ width: currentIndex == index ? 20 : 7, height: 7, backgroundColor: currentIndex == index ? color.gray : '#CCCCCC', borderRadius: 50 }} />
+                                <View style={{ width: currentIndex == index ? 20 : 7, height: 7, backgroundColor: currentIndex == index ? '#ffff' : '#CCCCCC', borderRadius: 50 }} />
                             </View >
 
                         )
@@ -94,9 +99,19 @@ const ProductSlider = ({ carouselRef, currentIndex, setCurrentIndex }) => {
             </View>
 
 
-            <View style={{right:15,position:"absolute",bottom:10}}>
+            {/* <View style={{ right: 15, position: "absolute", bottom: 10 }}>
                 <ExportSvg.LoveFav />
-            </View>
+            </View> */}
+            <TouchableOpacity onPress={() => favoriteProduct(item)} style={{ right: 15, position: "absolute", bottom: 10 }}>
+                {
+                    isFavorite ?
+                        <ExportSvg.LoveColorFav />
+                        :
+                        <ExportSvg.LoveFav />
+                }
+            </TouchableOpacity>
+
+        
         </View>
     )
 }
@@ -112,32 +127,30 @@ const styles = StyleSheet.create({
 
 
     renderItem1_img: {
-        width: 350,
-        height: 300,
+        width: Dimensions.get('screen').width,
+        height: Dimensions.get('screen').width,
     },
-
-
 
     carouselContainer: {
         alignItems: "center",
-        padding: 20,
+        // padding: 20,
+        marginVertical:10
     },
 
     iconLeft: {
-        position: 'absolute',
         left: -15,
-        top: '42%',
-        transform: [{ translateY: -12 }],
-        zIndex: 1,
-        padding: 20,
 
     },
     iconRight: {
-        position: 'absolute',
         right: -15,
+    },
+    iconCommon:{
+        position: 'absolute',
         top: '42%',
         transform: [{ translateY: -12 }],
-        zIndex: 1,
         padding: 20,
-    },
+        paddingHorizontal:30,
+        zIndex: 1,
+
+    }
 })

@@ -20,6 +20,13 @@
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
+        
       </activity>
+      <meta-data
+            android:name="com.google.android.gms.wallet.api.enabled"
+            android:value="true" />
+       <meta-data
+            android:name="com.stripe.publishable_key"
+            android:value="pk_test_51PV9zKFt9d3eerZLogRwve2G5YO4ZUNIUnLCEFpiljRIfKVN7hI7dle16OjcnN2ly7T2vwmB9FWJG0JGzSMCQnNe00k69iWIhI" />
     </application>
 </manifest>

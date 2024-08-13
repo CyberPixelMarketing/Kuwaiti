@@ -1,19 +1,17 @@
 import { StyleSheet, Text, View } from 'react-native'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { color } from './constants/color'
 import ExportSvg from './constants/ExportSvg'
+import { useSelector } from 'react-redux'
+import { TabRouter } from '@react-navigation/native'
 
 const SplashScreen = ({ navigation }) => {
-
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            navigation.navigate('Login');
-        }, 2000);
-
-        return () => clearTimeout(timer);
-    }, [navigation]);
-
-
+   const token = useSelector((state)=>state.auth.token)
+    useEffect(()=>{
+     if(token){
+        
+     }
+    },[])
     return (
         <View style={styles.mainContainer}>
             <ExportSvg.SplashLogo />

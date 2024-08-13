@@ -9,11 +9,14 @@ import Icon from '../assets/svg/BottomSvg/Index';
 import Notification from '../screens/userScreens/Notification';
 import HomeNavigation from './HomeNavigation';
 import AllProducts from '../screens/userScreens/AllProducts';
+import MyFavorite from '../screens/userScreens/MyFavorite';
+import ProfileTab from './ProfileTab';
+import AllProductsTab from './AllProductsTab';
 const Tab = createBottomTabNavigator();
 const BottomNavigation = () => {
 
     return (
-        <Tab.Navigator screenOptions={{
+        <Tab.Navigator initialRouteName='HomeNavigation' screenOptions={{
             headerShown: false,
             tabBarStyle: {
                 borderTopLeftRadius: 30,
@@ -34,10 +37,11 @@ const BottomNavigation = () => {
 
             },
             tabBarHideOnKeyboard: 'true',
+            
         }}>
             <Tab.Screen
-                name="HomeScreen"
-                component={HomeScreen}
+                name="HomeNavigation"
+                component={HomeNavigation}
                 options={{
                     tabBarIcon: ({ color, size, focused }) => {
                         return (
@@ -50,17 +54,15 @@ const BottomNavigation = () => {
                         )
                     },
                     title: "",
-
                 }}
             />
-
 
 
             <Tab.Screen
 
 
-                name="AllProducts"
-                component={AllProducts}
+                name="AllProductsTab"
+                component={AllProductsTab}
                 options={{
                     tabBarIcon: ({ size, color, focused }) => {
                         return (
@@ -72,30 +74,26 @@ const BottomNavigation = () => {
                             </View>
                         )
                     },
-                    // tabBarLabelPosition: "beside-icon",
                     title: ""
 
 
                 }}
             />
+
             <Tab.Screen
-                name="Notification "
-                component={Notification}
+                name="MyFavorite"
+                component={MyFavorite}
                 options={{
                     tabBarIcon: ({ size, color, focused }) => {
                         return (
-
-
-
                             <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: "#eee", borderRadius: 30 }}>
                                 <View style={[styles.iconContainer, focused && { backgroundColor: "#67300F" }]}>
-                                    <Icon.BottomNotification color={focused ? "#fff" : "#67300F"} />
+                                    <Icon.heartOutline color={focused ? "#fff" : "#67300F"} />
                                 </View>
-                                {focused && <Text style={styles.tabTxt}>Notification</Text>}
+                                {focused && <Text style={styles.tabTxt}>My Favorite</Text>}
                             </View>
                         )
                     },
-                    // tabBarLabelPosition: "beside-icon",
                     title: ""
 
                 }}
@@ -103,8 +101,8 @@ const BottomNavigation = () => {
 
 
             <Tab.Screen
-                name="UserProfile"
-                component={UserProfile}
+                name="ProfileTab"
+                component={ProfileTab}
                 options={{
                     tabBarIcon: ({ size, color, focused }) => {
                         return (
@@ -116,7 +114,6 @@ const BottomNavigation = () => {
                             </View>
                         )
                     },
-                    // tabBarLabelPosition: "beside-icon",
                     title: ""
                 }}
             />

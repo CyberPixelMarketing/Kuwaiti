@@ -4,113 +4,167 @@ import ExportSvg from '../../constants/ExportSvg'
 import { color } from '../../constants/color'
 import { bags } from '../../constants/data'
 import { LogBox } from 'react-native';
-const {height} = Dimensions.get('screen')
+import { useDispatch, useSelector } from 'react-redux'
+import { decrementCounter, deleteProduct, incrementCounter, selectTotalPrice } from '../../redux/reducer/ProductAddToCart'
+import EmptyScreen from '../../components/EmptyScreen'
+const { height } = Dimensions.get('screen')
 
 
 const MyCart = ({ navigation }) => {
-    const [productOrder, setProductOrder] = useState(1)
-    const increment = (id) => {
-        bags?.map((item, index) => {
-            if (index == id) {
-                setProductOrder(productOrder > 1 ? productOrder - 1 : 1)
-            }
-        })
+    const dispatch = useDispatch()
+    const data = useSelector((state) => state.cartProducts?.cartProducts)
+
+    const calculateTotalPrice = (items) => {
+        return items.reduce((total, item) => {
+            return total + (item.counter * parseFloat(item.price));
+        }, 0).toFixed(2);
+    };
+
+    const totalPrice = calculateTotalPrice(data);
+
+    const incrementProduct = (id) => {
+        dispatch(incrementCounter(id))
     }
+
+    const decrementProduct = (id) => {
+        dispatch(decrementCounter(id))
+    }
+
+    const productDelete = (id) => {
+        dispatch(deleteProduct(id))
+    }
+
+
     const renderItem = ({ item, index }) => {
         return (
             <View style={styles.productContainer}>
-                <Image borderRadius={5} source={item?.img} style={{ width: 80, height: 80 }} />
+                <Image borderRadius={5} source={{ uri: item?.image }} style={{ width: 80, height: 80 }} />
 
                 <View style={{ marginLeft: 10 }}>
-                    <Text style={styles.productTitle}>{item?.title}</Text>
-                    <Text style={styles.subTitle}>{item?.subTxt}</Text>
-                    <Text style={styles.productPrice}>{item?.price}</Text>
+                    <Text style={styles.productTitle}>{item?.productName}</Text>
+                    <Text style={styles.subTitle}>{item?.subText}</Text>
+                    {/* <Text style={styles.productPrice}>KD{item?.price?.toFixed(2)}</Text> */}
+                    <Text style={styles.productPrice}>KD{item?.price}</Text>
                 </View>
 
 
                 <View style={styles.counterMainContainer}>
-                    <View style={styles.itemCounter}>
-                        <TouchableOpacity onPress={() => increment(index)}>
-                            <Text style={styles.decrementBtnTxt}>-</Text>
-                        </TouchableOpacity>
+                    <TouchableOpacity style={{ alignSelf: "center" }} onPress={() => productDelete(item?.id)}>
+                        <ExportSvg.deletes />
+                    </TouchableOpacity>
 
-                        <Text style={styles.counterNumberTxt}>{productOrder}</Text>
+                    <View >
+                        <View style={styles.itemCounter}>
+                            <TouchableOpacity onPress={() => decrementProduct(item?.id)}>
+                                <Text style={styles.decrementBtnTxt}>-</Text>
+                            </TouchableOpacity>
 
-                        <TouchableOpacity onPress={() => setProductOrder(productOrder + 1)}>
-                            <Text style={styles.incrementBtnTxt}>+</Text>
-                        </TouchableOpacity>
+                            <Text style={styles.counterNumberTxt}>{item?.counter}</Text>
+
+
+                            <TouchableOpacity onPress={() => incrementProduct(item?.id)}>
+                                <Text style={styles.incrementBtnTxt}>+</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
             </View>
         )
     }
- 
+
+    useEffect(() => {
+        LogBox.ignoreLogs(['VirtualizedLists should never be nested']);
+    }, [])
 
 
-useEffect(() => {
-    LogBox.ignoreLogs(['VirtualizedLists should never be nested']);
-}, [])
+    const handlePress = () => {
+        if (data.length) {
+            // navigation.navigate('ShippingAddress',{
+            //     totalPrice:totalPrice
+            // })
+
+            navigation.navigate('OrderDetails',{
+                totalPrice:totalPrice
+            })
+        } else {
+            alert('Your cart is empty. Add items to get started!')
+        }
+    }
+
+    if(data?.length == 0) {
+        return(
+          <EmptyScreen
+        text={'No Item In The Cart'}
+          />
+        )
+    }
 
     return (
 
         <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-        <View style={styles.mainContainer}>
-            <View style={styles.headerContainer}>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <ExportSvg.ClickMenuBar />
-                </TouchableOpacity>
-                <ExportSvg.SmallLogo />
-                <ExportSvg.ShippingCart />
-            </View>
-
-
-            <Text style={[styles.productName]}>My Cart</Text>
-
-            <ScrollView  showsVerticalScrollIndicator={false} contentContainerStyle={{flexGrow:1,marginBottom:60}}>
-
-                <View>
-                    <FlatList
-                        data={bags?.slice(1)}
-                        keyExtractor={(item, index) => index?.toString()}
-                        renderItem={renderItem}
-                    />
-                </View>
-
-                <View style={styles.promoContainer}>
-                    <TextInput
-                        placeholder='Promo Code'
-                        style={styles.inputStyle}
-
-                    />
-
-
-                    <TouchableOpacity style={styles.applyBtnBox}>
-                        <Text style={styles.applyBtnTxt}>Apply</Text>
+            style={{ flex: 1 }}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+            <View style={styles.mainContainer}>
+                <View style={styles.headerContainer}>
+                    <TouchableOpacity onPress={() => navigation.goBack()}>
+                        <ExportSvg.ClickMenuBar />
                     </TouchableOpacity>
+                    <ExportSvg.SmallLogo />
+                    <View style={styles.rightIconBox}>
+                        <ExportSvg.ShippingCart />
+                        <View style={styles.rightIconNumber}>
+                            <Text style={styles.noOfItemTxt}>{data?.length}</Text>
+                        </View>
+                    </View>
                 </View>
-                <View style={{ flex: 1, justifyContent: "flex-end", marginBottom: 25 }}>
 
-                    <View style={styles.noOfItemBox}>
-                        <Text style={styles.selectedItemTxt}>Total (3 item):</Text>
-                        <Text style={styles.selectedItemPriceTxt}>KD500</Text>
+
+                <Text style={[styles.productName]}>My Cart</Text>
+
+                <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1, marginBottom: 60 }}>
+
+                    <View>
+                        <FlatList
+                            data={data}
+                            keyExtractor={(item, index) => index?.toString()}
+                            renderItem={renderItem}
+                        />
                     </View>
 
-                    <View style={styles.bottomPriceCartBox}>
-                        <Text style={styles.proceedTxt}>Proceed to Checkout</Text>
-                        <View style={styles.bottomCartBox}>
-                            <TouchableOpacity onPress={() => navigation.navigate('MyCart')}>
-                                <ExportSvg.BoldArrow style={{}} />
-                            </TouchableOpacity>
+                    {/* <View style={styles.promoContainer}>
+                        <TextInput
+                            placeholder='Promo Code'
+                            style={styles.inputStyle}
+                            placeholderTextColor={'#cecece'}
+
+                        />
+
+
+                        <TouchableOpacity style={styles.applyBtnBox}>
+                            <Text style={styles.applyBtnTxt}>Apply</Text>
+                        </TouchableOpacity>
+                    </View> */}
+                    <View style={{ flex: 1, justifyContent: "flex-end", marginBottom: 25 }}>
+
+                        <View style={styles.noOfItemBox}>
+                            <Text style={styles.selectedItemTxt}>Total ({data?.length} item):</Text>
+                            <Text style={styles.selectedItemPriceTxt}>KD{totalPrice}</Text>
                         </View>
 
+                        <View style={styles.bottomPriceCartBox}>
+                            <Text style={styles.proceedTxt}>Proceed to Checkout</Text>
+                            <TouchableOpacity onPress={handlePress} style={styles.bottomCartBox}>
+                                <View >
+                                    <ExportSvg.BoldArrow style={{}} />
+                                </View>
+                            </TouchableOpacity>
 
+
+                        </View>
                     </View>
-                </View>
-            </ScrollView>
+                </ScrollView>
 
-        </View>
+            </View>
         </KeyboardAvoidingView>
 
     )
@@ -121,7 +175,7 @@ export default MyCart
 const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
-        paddingTop: Platform.OS=='ios'? 40:20,
+        paddingTop: Platform.OS == 'ios' ? 40 : 20,
         paddingHorizontal: 15,
         backgroundColor: "#ffffff90"
 
@@ -135,9 +189,14 @@ const styles = StyleSheet.create({
     productName: {
         fontSize: 18,
         color: color.theme,
-        fontWeight:"600",
-        fontFamily:"Montserrat-Bold"
+        fontWeight: "600",
+        fontFamily: "Montserrat-Bold"
 
+    },
+    emptyScreen:{
+     flex:1,
+     alignItems:"center",
+     justifyContent:"center"
     },
 
     productContainer: {
@@ -157,6 +216,7 @@ const styles = StyleSheet.create({
 
 
 
+
     },
     productTitle: {
         color: color.theme,
@@ -165,7 +225,7 @@ const styles = StyleSheet.create({
     },
     subTitle: {
         color: color.gray,
-        fontSize:11,
+        fontSize: 11,
         fontFamily: "Montserrat-SemiBold"
 
 
@@ -179,8 +239,9 @@ const styles = StyleSheet.create({
 
     },
     counterMainContainer: {
-        flex: 1,
-        justifyContent: "flex-end"
+        marginLeft: "auto",
+        alignSelf: "center",
+        gap: 20
     },
 
     itemCounter: {
@@ -218,7 +279,8 @@ const styles = StyleSheet.create({
         borderRadius: 10
     },
     inputStyle: {
-        width: "77%"
+        width: "77%",
+        color:"#000"
     },
     applyBtnBox: {
         backgroundColor: color.theme,
@@ -229,6 +291,35 @@ const styles = StyleSheet.create({
     applyBtnTxt: {
         color: "#fff",
         fontWeight: "500"
+    },
+    rightIconBox: {
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        backgroundColor: "#fff",
+        elevation: 5,
+        padding: 10,
+        borderRadius: 50
+    },
+    rightIconNumber: {
+        position: "absolute",
+        backgroundColor: color.theme,
+        right: 0,
+        width: 15,
+        height: 15,
+        alignItems: "center",
+        justifyContent: "center",
+        borderRadius: 50,
+        right: -5
+
+    },
+    noOfItemTxt: {
+        color: "#fff",
+        fontSize: 10
     },
 
 

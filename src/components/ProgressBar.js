@@ -10,7 +10,7 @@ const ProgressBar = ({
 
 }) => {
 
-    const labels = ["", "", "", ""];
+    const labels = ["Confirmed", "Processing", "Delivery", "Completed"];
     const customStyles = {
         stepIndicatorSize: 5,
         currentStepIndicatorSize: 30,
@@ -32,7 +32,7 @@ const ProgressBar = ({
         stepIndicatorLabelUnFinishedColor: '#aaaaaa',
         labelColor: '#999999',
         labelSize: 13,
-        currentStepLabelColor: '#fe7013'
+        currentStepLabelColor: color.theme
     };
 
     const onPageChange = (position) => {

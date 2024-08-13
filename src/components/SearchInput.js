@@ -3,7 +3,7 @@ import React from 'react'
 import ExportSvg from '../constants/ExportSvg'
 import { color } from '../constants/color'
 
-const SearchInput = () => {
+const SearchInput = ({value,onChangeText}) => {
     return (
         <View style={styles.container}>
             <ExportSvg.Search style={{
@@ -14,6 +14,9 @@ const SearchInput = () => {
                 placeholder='Search...'
                 style={{width:"80%",color:"#000"}}
                 placeholderTextColor={color.gray}
+                value={value}
+                onChangeText={onChangeText}
+                autoCorrect={false}
             />
         </View>
     )
