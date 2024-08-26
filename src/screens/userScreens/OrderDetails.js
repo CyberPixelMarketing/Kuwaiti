@@ -62,6 +62,10 @@ const OrderDetails = ({ navigation, route }) => {
     }
 
     const handleOnPress = () => {
+        address?.length == 0 || address == undefined?
+        alert('Please Add Shipping Address')
+        :
+        
         navigation.navigate('PaymentOrder', {
             totalPrice: value
         })
@@ -157,7 +161,7 @@ const OrderDetails = ({ navigation, route }) => {
                             <Text style={styles.bottomPrice}>KD{value}</Text>
                         </View>
 
-                        <TouchableOpacity style={styles.bottomPlaceOrderBox} onPress={handleOnPress}>
+                        <TouchableOpacity   style={styles.bottomPlaceOrderBox} onPress={handleOnPress}>
                             <Text style={styles.orderTxt}>Place Order</Text>
                         </TouchableOpacity>
                     </View>

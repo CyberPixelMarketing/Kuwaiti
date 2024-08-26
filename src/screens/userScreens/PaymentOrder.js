@@ -52,8 +52,6 @@ const PaymentOrder = ({ navigation, route }) => {
         }
     }
 
-
-
     const renderItem = ({ item, index }) => {
         return (
             <View style={styles.productContainer}>
@@ -72,7 +70,6 @@ const PaymentOrder = ({ navigation, route }) => {
             </View>
         )
     }
-
 
     const paymentPress = (payment) => {
         setSelectedPayment(payment)

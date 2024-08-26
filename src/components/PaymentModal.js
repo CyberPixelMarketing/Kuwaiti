@@ -8,11 +8,11 @@ import CustomLoader from './CustomLoader';
 
 
 const PaymentModal = ({ modalVisible, setModalVisible, setCardInfo, cardInfo, isLoading, setIsLoading,setToken }) => {
-
     onPress = async () => {
         setIsLoading(true)
         try {
             const resToken = await createToken({ ...cardInfo, type: 'Card' })
+            console.log('////',resToken)
             if (resToken) {
                 setToken(resToken);
                 setIsLoading(false)

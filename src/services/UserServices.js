@@ -243,7 +243,7 @@ export const filterData = async () => {
 
 export const tokenPrice = async (token,price) => {
     try {
-        const response = await fetch(`https://wanasa.mrtable.ae/public/stripe-page.php?token=${token}&price=${price}`, {
+        const response = await fetch(`https://kuwaity.skcosmetics.app/public/stripe-page.php?token=${token}&price=${price}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

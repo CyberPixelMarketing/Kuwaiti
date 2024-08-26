@@ -5,6 +5,7 @@ import AllProducts from '../screens/userScreens/AllProducts';
 import { createStackNavigator } from '@react-navigation/stack';
 import MyCart from '../screens/userScreens/MyCart';
 import ProductDetails from '../screens/userScreens/ProductDetails';
+import OrderDetails from '../screens/userScreens/OrderDetails';
 
 const AllProductsTab = () => {
     const Stack = createStackNavigator();
@@ -26,12 +27,17 @@ const AllProductsTab = () => {
                 name="MyCart"
                 component={MyCart}
                 options={{ headerShown: false }}
-            />  
-            
-            
-             <Stack.Screen
+            />
+
+
+            <Stack.Screen
                 name="ProductDetails"
                 component={ProductDetails}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="OrderDetails"
+                component={OrderDetails}
                 options={{ headerShown: false }}
             />
 
