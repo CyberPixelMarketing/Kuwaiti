@@ -20,8 +20,8 @@ const Filters = ({ navigation }) => {
     const [selectAge, setSelectedAge] = useState([])
 
 
-    const [initialAge, setInitialAge] = useState(0);
-    const [endAge, setEndAge] = useState(10);
+    const [startingPrice, setStartingPrice] = useState(0);
+    const [endPrice, setEndPrice] = useState(10);
 
     const [isLoader, setIsLoader] = useState(false)
     const [storeFilter, setStoreFilter] = useState('')
@@ -34,8 +34,8 @@ const Filters = ({ navigation }) => {
     // ++++++++
 
     const onAgeRangeChange = values => {
-        setInitialAge(values[0]);
-        setEndAge(values[1]);
+        setStartingPrice(values[0]);
+        setEndPrice(values[1]);
     };
 
     const sliderSet = (a, b) => {
@@ -131,10 +131,10 @@ const Filters = ({ navigation }) => {
 
                 <View style={{ alignItems: "center" }}>
                     <MultiSlider
-                        values={[initialAge, endAge]}
+                        values={[startingPrice, endPrice]}
                         sliderLength={width / 1.2}
                         onValuesChange={onAgeRangeChange}
-                        onValuesChangeFinish={() => sliderSet(initialAge, endAge)}
+                        onValuesChangeFinish={() => sliderSet(startingPrice, endPrice)}
                         min={0}
                         max={100}
                         step={1}
@@ -158,8 +158,8 @@ const Filters = ({ navigation }) => {
 
                 </View>
                 <View style={styles.sliderBox}>
-                    <Text style={styles.ageText}>    ${initialAge} </Text>
-                    <Text style={styles.ageText}>   ${endAge} </Text>
+                    <Text style={styles.ageText}>    ${startingPrice} </Text>
+                    <Text style={styles.ageText}>   ${endPrice} </Text>
                 </View>
 
 
